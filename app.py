@@ -6,9 +6,10 @@ import mediapipe as mp
 import os  # Add this import statement
 from flask_cors import CORS  # Add this import statement
 
-CORS(app, origins="*")  # Acepta todos los orígenes
 
 app = Flask(__name__)
+CORS(app, origins="*")  # Acepta todos los orígenes
+
 socketio = SocketIO(app)
 
 mp_hands = mp.solutions.hands
