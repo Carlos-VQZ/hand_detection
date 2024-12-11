@@ -205,5 +205,7 @@ def video_stream(data):
             else:
                 send("Sin letra detectada")
 
-if __name__ == "__main__":
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+if __name__ == '__main__':
+    # Descomenta la siguiente línea si estás usando Flask-SocketIO
+    # socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)  # Para desarrollo, usa esta línea temporalmente.
