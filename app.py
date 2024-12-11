@@ -209,6 +209,41 @@ def video_stream(ws):
         else:
             break
 
+
+@sock.route('/abc')
+def abc(ws):
+    while True:
+        data = ws.receive()
+        if data:
+            # Decodificar frame
+            np_frame = np.frombuffer(data, np.uint8)
+            frame = cv2.imdecode(np_frame, cv2.IMREAD_COLOR)
+
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            resultado = hands.process(rgb_frame)
+
+            if resultado.multi_hand_landmarks:
+                for hand_landmarks in resultado.multi_hand_landmarks:
+                    # Dibujamos las conexiones de la mano
+                    mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+                    # Extraemos los puntos actuales de la mano
+                    puntos_mano = hand_landmarks.landmark
+
+                    conjunto_detectado = comparar_conjuntos_puntos(puntos_mano, conjuntos_puntos_correctos)
+                    print(f"Conjunto detectado: {conjunto_detectado}")
+                    if conjunto_detectado != -1:
+                        if conjunto_detectado == 0:
+                            ws.send("a")
+                        elif conjunto_detectado == 1:
+                            ws.send("b")
+                        elif conjunto_detectado == 2:
+                            ws.send("c")
+                    else:
+                        ws.send("Sin letra detectada")
+        else:
+            break
+
 @app.route('/hola')
 def hola():
     return "Hola mundo"
