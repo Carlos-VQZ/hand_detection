@@ -5,7 +5,6 @@ from flask_socketio import SocketIO, send
 import mediapipe as mp
 import os  # Add this import statement
 
-
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -207,5 +206,4 @@ def video_stream(data):
                 send("Sin letra detectada")
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Obtén el puerto desde la variable de entorno
-    socketio.run(app, host='0.0.0.0', port=port)  # Mantén socketio.run() para desarrollo local
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
