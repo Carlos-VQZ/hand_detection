@@ -3,6 +3,7 @@ import numpy as np
 from flask import Flask
 from flask_socketio import SocketIO, send
 import mediapipe as mp
+import os  # Add this import statement
 
 
 app = Flask(__name__)
