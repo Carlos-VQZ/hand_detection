@@ -172,6 +172,12 @@ def comparar_conjuntos_puntos(mano_actual, conjuntos_puntos_correctos, toleranci
 
 conjuntos_puntos_correctos = [puntos_correctos_a, puntos_correctos_b, puntos_correctos_g, puntos_correctos_t, puntos_correctos_o]
 
+@socketio.on('connect')
+def handle_connect():
+    print('Cliente conectado')
+    send("Conexión establecida")
+
+
 @socketio.on('video-stream')
 def video_stream(data):
     # Decodificar el frame recibido
