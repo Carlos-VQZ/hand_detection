@@ -4,6 +4,9 @@ from flask import Flask
 from flask_socketio import SocketIO, send
 import mediapipe as mp
 import os  # Add this import statement
+from flask_cors import CORS  # Add this import statement
+
+CORS(app, origins="*")  # Acepta todos los orígenes
 
 app = Flask(__name__)
 socketio = SocketIO(app)
