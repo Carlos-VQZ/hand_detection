@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
 from flask import Flask
-from flask_sock import Sock
+from flask_socketio import SocketIO, send
 import mediapipe as mp
 
+
 app = Flask(__name__)
-sock = Sock(app)
+socketio = SocketIO(app)
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -171,42 +172,38 @@ def comparar_conjuntos_puntos(mano_actual, conjuntos_puntos_correctos, toleranci
 
 conjuntos_puntos_correctos = [puntos_correctos_a, puntos_correctos_b, puntos_correctos_g, puntos_correctos_t, puntos_correctos_o]
 
-@sock.route('/video-stream')
-def video_stream(ws):
-    while True:
-        data = ws.receive()
-        if data:
-            # Decodificar frame
-            np_frame = np.frombuffer(data, np.uint8)
-            frame = cv2.imdecode(np_frame, cv2.IMREAD_COLOR)
+@socketio.on('video-stream')
+def video_stream(data):
+    # Decodificar el frame recibido
+    np_frame = np.frombuffer(data, np.uint8)
+    frame = cv2.imdecode(np_frame, cv2.IMREAD_COLOR)
 
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            resultado = hands.process(rgb_frame)
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    resultado = hands.process(rgb_frame)
 
-            if resultado.multi_hand_landmarks:
-                for hand_landmarks in resultado.multi_hand_landmarks:
-                    # Dibujamos las conexiones de la mano
-                    mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+    if resultado.multi_hand_landmarks:
+        for hand_landmarks in resultado.multi_hand_landmarks:
+            # Dibujar las conexiones de la mano
+            mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-                    # Extraemos los puntos actuales de la mano
-                    puntos_mano = hand_landmarks.landmark
+            # Extraer los puntos actuales de la mano
+            puntos_mano = hand_landmarks.landmark
 
-                    conjunto_detectado = comparar_conjuntos_puntos(puntos_mano, conjuntos_puntos_correctos)
-                    print(f"Conjunto detectado: {conjunto_detectado}")
-                    if conjunto_detectado != -1:
-                        if conjunto_detectado == 0:
-                            ws.send("a")
-                        elif conjunto_detectado == 1:
-                            ws.send("b")
-                        elif conjunto_detectado == 2:
-                            ws.send("g")
-                        elif conjunto_detectado == 3:
-                            ws.send("t")
-                        elif conjunto_detectado == 4:
-                            ws.send("o")
-                    else:
-                        ws.send("Sin letra detectada")
-        else:
-            break
+            conjunto_detectado = comparar_conjuntos_puntos(puntos_mano, conjuntos_puntos_correctos)
+            print(f"Conjunto detectado: {conjunto_detectado}")
+            if conjunto_detectado != -1:
+                if conjunto_detectado == 0:
+                    send("a")
+                elif conjunto_detectado == 1:
+                    send("b")
+                elif conjunto_detectado == 2:
+                    send("g")
+                elif conjunto_detectado == 3:
+                    send("t")
+                elif conjunto_detectado == 4:
+                    send("o")
+            else:
+                send("Sin letra detectada")
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=6000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=6000, debug=True)
