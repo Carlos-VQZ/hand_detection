@@ -207,5 +207,5 @@ def video_stream(data):
                 send("Sin letra detectada")
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # Default to 5000 if no PORT is set
-    socketio.run(app, host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 5000))  # Obtén el puerto desde la variable de entorno
+    socketio.run(app, host='0.0.0.0', port=port)  # Mantén socketio.run() para desarrollo local
